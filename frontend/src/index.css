@@ -1,0 +1,22 @@
+/* =========================================
+   SHARED PAGE-WITH-SIDEBAR OFFSET
+========================================= */
+
+.with-sidebar {
+  margin-left: 300px;
+  width: calc(100% - 300px);
+}
+
+@media (max-width: 1000px) {
+  .with-sidebar {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+  }
+}
+
+@media (max-width: 768px) {
+  .with-sidebar {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+  }
+}
