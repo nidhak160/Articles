@@ -6,6 +6,47 @@ from .database import Base
 
 
 # ==========================================
+# USER
+# ==========================================
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    name = Column(
+        String(150),
+        nullable=False
+    )
+
+    email = Column(
+        String(255),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    password = Column(
+        String(255),
+        nullable=False
+    )
+
+    role = Column(
+        String(30),
+        nullable=False,
+        default="user"
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+# ==========================================
 # CATEGORY
 # ==========================================
 
@@ -94,7 +135,10 @@ class Article(Base):
         nullable=False
     )
 
-    content = Column(Text, nullable=False)
+    content = Column(
+        Text,
+        nullable=False
+    )
 
     image = Column(
         String(500),
@@ -125,7 +169,7 @@ class Article(Base):
 
     status = Column(
         String(30),
-        default="pending",
+        default="draft",
         nullable=False
     )
 

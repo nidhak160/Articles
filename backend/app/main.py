@@ -5,13 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from .database import Base, engine
 from .routes import articles
 from .routes import categories
-
-
-# ==========================================
-# DATABASE TABLES
-# ==========================================
-
-Base.metadata.create_all(bind=engine)
+from .routes import auth
+from .routes import reviewer
 
 
 # ==========================================
@@ -22,6 +17,13 @@ app = FastAPI(
     title="Article API",
     version="1.0.0"
 )
+
+
+# ==========================================
+# DATABASE TABLES
+# ==========================================
+
+Base.metadata.create_all(bind=engine)
 
 
 # ==========================================
@@ -56,15 +58,38 @@ app.mount(
 
 
 # ==========================================
-# ROUTES
+# AUTH ROUTES
+# ==========================================
+
+app.include_router(
+    auth.router
+)
+
+
+# ==========================================
+# CATEGORY ROUTES
 # ==========================================
 
 app.include_router(
     categories.router
 )
 
+
+# ==========================================
+# ARTICLE ROUTES
+# ==========================================
+
 app.include_router(
     articles.router
+)
+
+
+# ==========================================
+# REVIEWER ROUTES
+# ==========================================
+
+app.include_router(
+    reviewer.router
 )
 
 

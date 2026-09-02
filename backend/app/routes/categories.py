@@ -168,3 +168,47 @@ def get_subcategories(
         )
         .all()
     )
+
+
+# ==========================================
+# DELETE SUBCATEGORY
+# ==========================================
+
+@router.delete(
+    "/subcategories/{subcategory_id}"
+)
+def delete_subcategory(
+    subcategory_id: int,
+    db: Session = Depends(get_db)
+):
+
+    # Find subcategory
+    subcategory = db.query(SubCategory).filter(
+        SubCategory.id == subcategory_id
+    ).first()
+
+    if not subcategory:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Subcategory not found"
+        )
+
+    # Check if articles use this subcategory
+    articles = db.query(Article).filter(
+        Article.subcategory_id == subcategory_id
+    ).all()
+
+    # Remove subcategory from articles
+    for article in articles:
+        article.subcategory_id = None
+
+    # Delete subcategory
+    db.delete(subcategory)
+
+    db.commit()
+
+    return {
+        "message": "Subcategory deleted successfully",
+        "subcategory_id": subcategory_id
+    }    

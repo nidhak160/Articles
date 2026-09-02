@@ -1,0 +1,446 @@
+/* ==========================================
+   REGISTER PAGE
+========================================== */
+
+.register-page {
+    min-height: 100vh;
+
+    background: #f4f6f8;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
+}
+
+
+/* ==========================================
+   MAIN CARD
+========================================== */
+
+.register-card {
+    width: 100%;
+    max-width: 1050px;
+
+    min-height: 650px;
+
+    background: #ffffff;
+
+    display: grid;
+
+    grid-template-columns: 46% 54%;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==========================================
+   LEFT
+========================================== */
+
+.register-left {
+    background: #111827;
+
+    color: #ffffff;
+
+    padding: 55px 48px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+}
+
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.register-logo {
+    font-size: 25px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+.register-logo span {
+    color: #f97316;
+}
+
+
+/* ==========================================
+   INTRO
+========================================== */
+
+.register-intro {
+    margin-top: 40px;
+}
+
+
+.register-small-title {
+    color: #f97316;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 15px;
+}
+
+
+.register-intro h1 {
+    font-size: 45px;
+
+    line-height: 1.08;
+
+    margin: 0 0 20px;
+
+    font-weight: 800;
+}
+
+
+.register-description {
+    max-width: 380px;
+
+    color: #cbd5e1;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+
+    margin: 0;
+}
+
+
+/* ==========================================
+   FEATURES
+========================================== */
+
+.register-features {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 22px;
+}
+
+
+.feature-item {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 18px;
+}
+
+
+.feature-number {
+    color: #f97316;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    padding-top: 3px;
+
+    min-width: 25px;
+}
+
+
+.feature-item h3 {
+    margin: 0 0 5px;
+
+    font-size: 16px;
+}
+
+
+.feature-item p {
+    margin: 0;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================
+   RIGHT
+========================================== */
+
+.register-right {
+    padding: 55px 65px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.register-form-header {
+    margin-bottom: 28px;
+}
+
+
+.register-form-header h2 {
+    margin: 0 0 8px;
+
+    color: #111827;
+
+    font-size: 30px;
+
+    font-weight: 800;
+}
+
+
+.register-form-header p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   ALERT
+========================================== */
+
+.register-alert {
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+
+    font-size: 13px;
+}
+
+
+.register-alert.error {
+    background: #fef2f2;
+
+    color: #dc2626;
+
+    border: 1px solid #fecaca;
+}
+
+
+.register-alert.success {
+    background: #f0fdf4;
+
+    color: #16a34a;
+
+    border: 1px solid #bbf7d0;
+}
+
+
+/* ==========================================
+   FORM FIELD
+========================================== */
+
+.register-field {
+    margin-bottom: 19px;
+}
+
+
+.register-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #374151;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.register-field input,
+.register-field select {
+    width: 100%;
+
+    height: 48px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    padding: 0 14px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+
+.register-field input::placeholder {
+    color: #9ca3af;
+}
+
+
+.register-field input:focus,
+.register-field select:focus {
+    border-color: #f97316;
+
+    box-shadow:
+        0 0 0 3px rgba(249, 115, 22, 0.10);
+}
+
+
+/* ==========================================
+   BUTTON
+========================================== */
+
+.register-btn {
+    width: 100%;
+
+    height: 50px;
+
+    margin-top: 5px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #f97316;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.register-btn:hover {
+    background: #ea580c;
+}
+
+
+.register-btn:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   LOGIN
+========================================== */
+
+.register-login {
+    margin-top: 25px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    font-size: 13px;
+
+    color: #6b7280;
+}
+
+
+.register-login a {
+    color: #f97316;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+.register-login a:hover {
+    text-decoration: underline;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 850px) {
+
+    .register-card {
+        grid-template-columns: 1fr;
+
+        max-width: 550px;
+    }
+
+    .register-left {
+        padding: 40px 35px;
+
+        min-height: 400px;
+    }
+
+    .register-intro h1 {
+        font-size: 36px;
+    }
+
+    .register-right {
+        padding: 40px 35px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .register-page {
+        padding: 15px;
+    }
+
+    .register-left {
+        padding: 35px 25px;
+    }
+
+    .register-right {
+        padding: 35px 25px;
+    }
+
+    .register-intro h1 {
+        font-size: 30px;
+    }
+
+    .register-form-header h2 {
+        font-size: 26px;
+    }
+
+}

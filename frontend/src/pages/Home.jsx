@@ -9,722 +9,634 @@ import {
 
 import "./Home.css";
 
-
 function Home() {
-
-  const [categories, setCategories] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // ==========================================
+  // LOAD DATA
+  // ==========================================
 
   useEffect(() => {
     loadHomeData();
   }, []);
 
-
   const loadHomeData = async () => {
-
     try {
-
       setLoading(true);
       setError("");
 
-      const [categoryData, articleData] =
-        await Promise.all([
-          getCategories(),
-          getArticles(),
-        ]);
-
+      const [categoryData, articleData] = await Promise.all([
+        getCategories(),
+        getArticles(),
+      ]);
 
       setCategories(
-        Array.isArray(categoryData)
-          ? categoryData
-          : []
+        Array.isArray(categoryData) ? categoryData : []
       );
-
 
       setArticles(
-        Array.isArray(articleData)
-          ? articleData
-          : []
+        Array.isArray(articleData) ? articleData : []
       );
-
     } catch (err) {
-
       console.error(err);
 
       setError(
         "Unable to load articles. Please check that your FastAPI server is running."
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
-
-  /* ======================================
-     IMAGE
-  ====================================== */
+  // ==========================================
+  // IMAGE
+  // ==========================================
 
   const getArticleImage = (article) => {
-
-    if (!article.image) {
-
-      return "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1000&q=80";
-
+    if (!article?.image) {
+      return "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=85";
     }
-
 
     if (article.image.startsWith("http")) {
-
       return article.image;
-
     }
 
-
     return `http://127.0.0.1:8000${article.image}`;
-
   };
 
-
-  /* ======================================
-     CATEGORY NAME
-  ====================================== */
+  // ==========================================
+  // CATEGORY
+  // ==========================================
 
   const getCategoryName = (categoryId) => {
-
     const category = categories.find(
       (item) => item.id === categoryId
     );
 
     return category?.name || "General";
-
   };
 
-
-  /* ======================================
-     DATE
-  ====================================== */
+  // ==========================================
+  // DATE
+  // ==========================================
 
   const formatDate = (date) => {
-
     if (!date) return "";
 
     const parsedDate = new Date(date);
 
     if (Number.isNaN(parsedDate.getTime())) {
-
       return date;
-
     }
 
-
-    return parsedDate.toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
-
+    return parsedDate.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
+  // ==========================================
+  // FEATURED + LATEST
+  // ==========================================
 
   const featuredArticle = articles[0];
 
-  const latestArticles = articles.slice(1, 7);
+  const latestArticles = articles.slice(1);
 
+  const carouselArticles = latestArticles.slice(0, 6);
 
-  return (
+  // ==========================================
+  // CAROUSEL
+  // ==========================================
 
-    <>
+  const nextSlide = () => {
+    if (!carouselArticles.length) return;
 
-      {/* ==================================
-          FIXED NAVBAR + SIDEBAR
-      ================================== */}
+    setCurrentSlide((prev) =>
+      prev === carouselArticles.length - 1 ? 0 : prev + 1
+    );
+  };
 
-      <Navbar />
+  const previousSlide = () => {
+    if (!carouselArticles.length) return;
 
+    setCurrentSlide((prev) =>
+      prev === 0 ? carouselArticles.length - 1 : prev - 1
+    );
+  };
 
-      {/* ==================================
-          PAGE CONTENT
+  // ==========================================
+  // AUTO CAROUSEL
+  // ==========================================
 
-          IMPORTANT:
-          page-with-sidebar handles
-          navbar + sidebar spacing
-      ================================== */}
+  useEffect(() => {
+    if (!carouselArticles.length) return;
 
-      <main className="page-with-sidebar home-page">
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) =>
+        prev === carouselArticles.length - 1 ? 0 : prev + 1
+      );
+    }, 5000);
 
+    return () => clearInterval(timer);
+  }, [carouselArticles.length]);
 
-        {/* ==================================
-            ERROR
-        ================================== */}
+  // ==========================================
+  // LOADING
+  // ==========================================
 
-        {error && (
+  if (loading) {
+    return (
+      <>
+        <Navbar />
 
-          <div className="home-error">
+        <main className="home-page">
+          <div className="loading-box">
+            <div className="loading-spinner"></div>
+            <p>Loading latest news...</p>
+          </div>
+        </main>
+      </>
+    );
+  }
 
-            <strong>
-              Something went wrong
-            </strong>
+  // ==========================================
+  // ERROR
+  // ==========================================
 
-            <p>
-              {error}
-            </p>
+  if (error) {
+    return (
+      <>
+        <Navbar />
+
+        <main className="home-page">
+          <div className="error-box">
+            <h2>Something went wrong</h2>
+
+            <p>{error}</p>
 
             <button onClick={loadHomeData}>
               Try Again
             </button>
-
           </div>
+        </main>
+      </>
+    );
+  }
 
-        )}
+  return (
+    <>
+      <Navbar />
 
+      <main className="home-page">
 
-        {/* ==================================
-            LOADING
-        ================================== */}
+        {/* ======================================
+            TOP HEADER
+        ====================================== */}
 
-        {loading ? (
+        <section className="news-header">
 
-          <div className="loading-container">
+          <div>
+            <span className="eyebrow">
+              DAILY NEWS
+            </span>
 
-            <div className="loading-spinner"></div>
+            <h1>
+              Stay Informed.
+              <br />
+              Stay Ahead.
+            </h1>
 
             <p>
-              Loading articles...
+              Latest stories, ideas and information
+              from around the world.
             </p>
-
           </div>
 
-        ) : (
+          <div className="header-date">
+            <span>Today</span>
+            <strong>
+              {new Date().toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+            </strong>
+          </div>
 
-          <>
+        </section>
 
 
-            {/* ==================================
-                HERO
-            ================================== */}
+        {/* ======================================
+            FEATURED NEWS
+        ====================================== */}
 
-            {featuredArticle && (
+        {featuredArticle && (
+          <section className="featured-section">
 
-              <section className="hero-section">
+            <div className="section-title-row">
 
-                <div className="section-heading">
+              <div>
+                <span className="section-label">
+                  TOP STORY
+                </span>
 
-                  <div>
+                <h2>Featured News</h2>
+              </div>
 
-                    <span className="section-label">
-                      TOP STORY
-                    </span>
+              <Link
+                to="/articles"
+                className="view-all"
+              >
+                View All →
+              </Link>
 
-                    <h1>
-                      Latest Stories
-                    </h1>
+            </div>
 
-                  </div>
 
-                </div>
+            <div className="featured-card">
 
+              <Link
+                to={`/articles/${featuredArticle.id}`}
+                className="featured-image"
+              >
 
-                <div className="hero-grid">
+                <img
+                  src={getArticleImage(featuredArticle)}
+                  alt={featuredArticle.title}
+                />
 
+                <span className="featured-badge">
+                  {getCategoryName(
+                    featuredArticle.category_id
+                  )}
+                </span>
 
-                  {/* IMAGE */}
+              </Link>
 
-                  <div className="hero-image-wrapper">
 
-                    <img
-                      src={getArticleImage(
-                        featuredArticle
-                      )}
-                      alt={featuredArticle.title}
-                      className="hero-image"
-                    />
+              <div className="featured-content">
 
+                <div className="article-meta">
 
-                    <div className="hero-image-overlay"></div>
+                  <span>
+                    {featuredArticle.author ||
+                      "Article Team"}
+                  </span>
 
+                  {featuredArticle.published_date && (
+                    <>
+                      <span>•</span>
 
-                    <div className="hero-category-badge">
-
-                      {getCategoryName(
-                        featuredArticle.category_id
-                      )}
-
-                    </div>
-
-                  </div>
-
-
-                  {/* CONTENT */}
-
-                  <div className="hero-content">
-
-                    <span className="article-meta">
-
-                      {featuredArticle.author ||
-                        "Article Team"}
-
-                      {featuredArticle.published_date && (
-
-                        <>
-
-                          <span>•</span>
-
-                          {formatDate(
-                            featuredArticle.published_date
-                          )}
-
-                        </>
-
-                      )}
-
-                    </span>
-
-
-                    <h2>
-                      {featuredArticle.title}
-                    </h2>
-
-
-                    <p>
-                      {featuredArticle.short_description}
-                    </p>
-
-
-                    <Link
-                      to={`/articles/${featuredArticle.id}`}
-                      className="read-more"
-                    >
-
-                      Read Full Article
-
-                      <span>→</span>
-
-                    </Link>
-
-                  </div>
-
-                </div>
-
-              </section>
-
-            )}
-
-
-            {/* ==================================
-                CATEGORIES
-            ================================== */}
-
-            {categories.length > 0 && (
-
-              <section className="category-section">
-
-                <div className="section-heading compact">
-
-                  <div>
-
-                    <span className="section-label">
-                      EXPLORE
-                    </span>
-
-                    <h2>
-                      Categories
-                    </h2>
-
-                  </div>
-
-                </div>
-
-
-                <div className="category-grid">
-
-                  {categories.map((category) => (
-
-                    <Link
-                      to={`/category/${category.id}`}
-                      className="category-card"
-                      key={category.id}
-                    >
-
-                      <div className="category-card-content">
-
-                        <span className="category-number">
-
-                          {String(category.id)
-                            .padStart(2, "0")}
-
-                        </span>
-
-
-                        <h3>
-                          {category.name}
-                        </h3>
-
-
-                        {category.subcategories &&
-                          category.subcategories.length > 0 && (
-
-                            <span className="subcategory-count">
-
-                              {category.subcategories.length}
-
-                              {" "}
-                              subcategories
-
-                            </span>
-
-                          )}
-
-                      </div>
-
-
-                      <span className="category-arrow">
-                        →
+                      <span>
+                        {formatDate(
+                          featuredArticle.published_date
+                        )}
                       </span>
-
-                    </Link>
-
-                  ))}
+                    </>
+                  )}
 
                 </div>
 
-              </section>
-
-            )}
-
-
-            {/* ==================================
-                LATEST ARTICLES
-            ================================== */}
-
-            {latestArticles.length > 0 && (
-
-              <section className="latest-section">
-
-                <div className="section-heading">
-
-                  <div>
-
-                    <span className="section-label">
-                      DISCOVER
-                    </span>
-
-                    <h2>
-                      Latest Articles
-                    </h2>
-
-                  </div>
-
-
-                  <Link
-                    to="/articles"
-                    className="view-all"
-                  >
-                    View All →
-                  </Link>
-
-                </div>
-
-
-                <div className="article-grid">
-
-                  {latestArticles.map((article) => (
-
-                    <article
-                      className="article-card"
-                      key={article.id}
-                    >
-
-
-                      {/* IMAGE */}
-
-                      <Link
-                        to={`/articles/${article.id}`}
-                        className="article-image-link"
-                      >
-
-                        <img
-                          src={getArticleImage(article)}
-                          alt={article.title}
-                          className="article-image"
-                        />
-
-
-                        <span className="article-category">
-
-                          {getCategoryName(
-                            article.category_id
-                          )}
-
-                        </span>
-
-                      </Link>
-
-
-                      {/* CONTENT */}
-
-                      <div className="article-content">
-
-                        <div className="article-info">
-
-                          <span>
-
-                            {article.author ||
-                              "Article Team"}
-
-                          </span>
-
-
-                          {article.published_date && (
-
-                            <>
-
-                              <span>
-                                •
-                              </span>
-
-                              <span>
-
-                                {formatDate(
-                                  article.published_date
-                                )}
-
-                              </span>
-
-                            </>
-
-                          )}
-
-                        </div>
-
-
-                        <h3>
-
-                          <Link
-                            to={`/articles/${article.id}`}
-                          >
-
-                            {article.title}
-
-                          </Link>
-
-                        </h3>
-
-
-                        <p>
-                          {article.short_description}
-                        </p>
-
-
-                        <Link
-                          to={`/articles/${article.id}`}
-                          className="card-read-more"
-                        >
-
-                          Read Article
-
-                          <span>
-                            →
-                          </span>
-
-                        </Link>
-
-                      </div>
-
-                    </article>
-
-                  ))}
-
-                </div>
-
-              </section>
-
-            )}
-
-
-            {/* ==================================
-                CATEGORY ARTICLES
-            ================================== */}
-
-            {categories.map((category) => {
-
-              const categoryArticles =
-                articles.filter(
-                  (article) =>
-                    article.category_id ===
-                    category.id
-                );
-
-
-              if (!categoryArticles.length) {
-
-                return null;
-
-              }
-
-
-              return (
-
-                <section
-                  className="category-articles-section"
-                  key={category.id}
-                >
-
-
-                  <div className="section-heading">
-
-                    <div>
-
-                      <span className="section-label">
-                        CATEGORY
-                      </span>
-
-                      <h2>
-                        {category.name}
-                      </h2>
-
-                    </div>
-
-
-                    <Link
-                      to={`/category/${category.id}`}
-                      className="view-all"
-                    >
-
-                      View All →
-
-                    </Link>
-
-                  </div>
-
-
-                  <div className="category-articles-grid">
-
-                    {categoryArticles
-                      .slice(0, 3)
-                      .map((article) => (
-
-                        <article
-                          className="small-article-card"
-                          key={article.id}
-                        >
-
-                          <img
-                            src={getArticleImage(article)}
-                            alt={article.title}
-                          />
-
-
-                          <div>
-
-                            <span className="small-article-meta">
-
-                              {formatDate(
-                                article.published_date
-                              )}
-
-                            </span>
-
-
-                            <h3>
-
-                              <Link
-                                to={`/articles/${article.id}`}
-                              >
-
-                                {article.title}
-
-                              </Link>
-
-                            </h3>
-
-
-                            <p>
-
-                              {article.short_description}
-
-                            </p>
-
-                          </div>
-
-                        </article>
-
-                      ))}
-
-                  </div>
-
-                </section>
-
-              );
-
-            })}
-
-
-            {/* ==================================
-                EMPTY
-            ================================== */}
-
-            {!articles.length && !error && (
-
-              <div className="empty-state">
-
-                <div className="empty-icon">
-                  📰
-                </div>
 
                 <h2>
-                  No Articles Yet
+                  {featuredArticle.title}
                 </h2>
 
+
                 <p>
-                  Articles will appear here once
-                  they are published.
+                  {featuredArticle.short_description}
                 </p>
+
+
+                <Link
+                  to={`/articles/${featuredArticle.id}`}
+                  className="primary-read"
+                >
+                  Read Full Article
+                  <span>→</span>
+                </Link>
 
               </div>
 
-            )}
+            </div>
 
-          </>
+          </section>
+        )}
 
+
+        {/* ======================================
+            LATEST NEWS CAROUSEL
+        ====================================== */}
+
+        {carouselArticles.length > 0 && (
+          <section className="latest-section">
+
+            <div className="section-title-row">
+
+              <div>
+                <span className="section-label">
+                  JUST IN
+                </span>
+
+                <h2>Latest News</h2>
+              </div>
+
+
+              <div className="carousel-controls">
+
+                <button
+                  onClick={previousSlide}
+                  aria-label="Previous news"
+                >
+                  ←
+                </button>
+
+                <button
+                  onClick={nextSlide}
+                  aria-label="Next news"
+                >
+                  →
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div className="latest-carousel">
+
+              {carouselArticles.map((article, index) => {
+
+                const position =
+                  index - currentSlide;
+
+                return (
+                  <article
+                    className={`latest-card ${
+                      position === 0
+                        ? "active"
+                        : ""
+                    }`}
+                    key={article.id}
+                    style={{
+                      transform: `translateX(calc(${position} * (100% + 24px)))`,
+                    }}
+                  >
+
+                    <Link
+                      to={`/articles/${article.id}`}
+                      className="latest-image"
+                    >
+
+                      <img
+                        src={getArticleImage(article)}
+                        alt={article.title}
+                      />
+
+                      <span>
+                        {getCategoryName(
+                          article.category_id
+                        )}
+                      </span>
+
+                    </Link>
+
+
+                    <div className="latest-content">
+
+                      <div className="article-meta">
+
+                        <span>
+                          {article.author ||
+                            "Article Team"}
+                        </span>
+
+                        <span>•</span>
+
+                        <span>
+                          {formatDate(
+                            article.published_date
+                          )}
+                        </span>
+
+                      </div>
+
+
+                      <h3>
+                        <Link
+                          to={`/articles/${article.id}`}
+                        >
+                          {article.title}
+                        </Link>
+                      </h3>
+
+
+                      <p>
+                        {article.short_description}
+                      </p>
+
+
+                      <Link
+                        to={`/articles/${article.id}`}
+                        className="small-read"
+                      >
+                        Read Story →
+                      </Link>
+
+                    </div>
+
+                  </article>
+                );
+              })}
+
+            </div>
+
+
+            <div className="carousel-dots">
+
+              {carouselArticles.map(
+                (article, index) => (
+                  <button
+                    key={article.id}
+                    className={
+                      index === currentSlide
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      setCurrentSlide(index)
+                    }
+                    aria-label={`Go to slide ${
+                      index + 1
+                    }`}
+                  />
+                )
+              )}
+
+            </div>
+
+          </section>
+        )}
+
+
+        {/* ======================================
+            ALL LATEST ARTICLES
+        ====================================== */}
+
+        {latestArticles.length > 0 && (
+          <section className="all-news-section">
+
+            <div className="section-title-row">
+
+              <div>
+                <span className="section-label">
+                  DISCOVER
+                </span>
+
+                <h2>More News</h2>
+              </div>
+
+              <Link
+                to="/articles"
+                className="view-all"
+              >
+                All Articles →
+              </Link>
+
+            </div>
+
+
+            <div className="news-grid">
+
+              {latestArticles.slice(0, 9).map(
+                (article) => (
+
+                  <article
+                    className="news-card"
+                    key={article.id}
+                  >
+
+                    <Link
+                      to={`/articles/${article.id}`}
+                      className="news-card-image"
+                    >
+
+                      <img
+                        src={getArticleImage(article)}
+                        alt={article.title}
+                      />
+
+                      <span>
+                        {getCategoryName(
+                          article.category_id
+                        )}
+                      </span>
+
+                    </Link>
+
+
+                    <div className="news-card-content">
+
+                      <div className="article-meta">
+
+                        <span>
+                          {article.author ||
+                            "Article Team"}
+                        </span>
+
+                        <span>•</span>
+
+                        <span>
+                          {formatDate(
+                            article.published_date
+                          )}
+                        </span>
+
+                      </div>
+
+
+                      <h3>
+                        <Link
+                          to={`/articles/${article.id}`}
+                        >
+                          {article.title}
+                        </Link>
+                      </h3>
+
+
+                      <p>
+                        {article.short_description}
+                      </p>
+
+
+                      <Link
+                        to={`/articles/${article.id}`}
+                        className="small-read"
+                      >
+                        Read Article →
+                      </Link>
+
+                    </div>
+
+                  </article>
+
+                )
+              )}
+
+            </div>
+
+          </section>
+        )}
+
+
+        {/* ======================================
+            EMPTY
+        ====================================== */}
+
+        {!articles.length && (
+          <div className="empty-box">
+
+            <div>📰</div>
+
+            <h2>No Articles Yet</h2>
+
+            <p>
+              Articles will appear here once
+              they are published.
+            </p>
+
+          </div>
         )}
 
       </main>
 
 
-      {/* ==================================
+      {/* ======================================
           FOOTER
-      ================================== */}
+      ====================================== */}
 
       <footer className="home-footer">
 
-        <div className="footer-container">
+        <div className="footer-inner">
 
-          <div className="footer-brand">
-
+          <div>
             <div className="footer-logo">
-
               <span>A</span>
-
               ARTICLE
-
             </div>
-
 
             <p>
               Your source for stories, ideas and
               information.
             </p>
-
           </div>
 
 
@@ -752,26 +664,14 @@ function Home() {
 
 
         <div className="footer-bottom">
-
-          <p>
-
-            © {new Date().getFullYear()}
-            {" "}
-            Article.
-            {" "}
-            All rights reserved.
-
-          </p>
-
+          © {new Date().getFullYear()} Article.
+          All rights reserved.
         </div>
 
       </footer>
 
     </>
-
   );
-
 }
-
 
 export default Home;

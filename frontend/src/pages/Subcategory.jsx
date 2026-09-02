@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getArticlesBySubcategory } from "../services/api";
+import {
+    getArticlesBySubcategory,
+    getCategories
+} from "../services/api";
+
 import Navbar from "../components/Navbar";
 import "./Subcategory.css";
 
@@ -9,27 +13,53 @@ function Subcategory() {
     const navigate = useNavigate();
 
     const [articles, setArticles] = useState([]);
+    const [subcategoryName, setSubcategoryName] = useState("Articles");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadArticles = async () => {
+        const loadData = async () => {
             try {
-                const data = await getArticlesBySubcategory(id);
-                setArticles(data);
+                // Get categories + subcategories
+                const categories = await getCategories();
+
+                // Find selected subcategory
+                for (const category of categories) {
+                    const subcategories = category.subcategories || [];
+
+                    const found = subcategories.find(
+                        (sub) => String(sub.id) === String(id)
+                    );
+
+                    if (found) {
+                        setSubcategoryName(found.name);
+                        break;
+                    }
+                }
+
+                // Get articles for selected subcategory
+                const articlesData =
+                    await getArticlesBySubcategory(id);
+
+                setArticles(articlesData);
+
             } catch (error) {
-                console.error("Failed to load subcategory articles:", error);
+                console.error(
+                    "Failed to load subcategory articles:",
+                    error
+                );
             } finally {
                 setLoading(false);
             }
         };
 
-        loadArticles();
+        loadData();
     }, [id]);
 
     if (loading) {
         return (
             <>
                 <Navbar />
+
                 <div className="subcategory-loading">
                     Loading articles...
                 </div>
@@ -43,7 +73,8 @@ function Subcategory() {
 
             <main className="subcategory-page">
 
-                <h1>Articles</h1>
+                {/* Dynamic heading */}
+                <h1>{subcategoryName}</h1>
 
                 {articles.length === 0 ? (
                     <div className="no-articles">

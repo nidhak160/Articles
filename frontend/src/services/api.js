@@ -4,10 +4,52 @@ const API_URL = "http://127.0.0.1:8000";
 
 
 // ==========================================
+// REGISTER USER
+// ==========================================
+
+export const registerUser = async (userData) => {
+
+    const response = await axios.post(
+        `${API_URL}/auth/register`,
+        userData
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// LOGIN USER
+// ==========================================
+
+export const loginUser = async (email, password) => {
+
+    const formData = new URLSearchParams();
+
+    formData.append("username", email);
+    formData.append("password", password);
+
+    const response = await axios.post(
+        `${API_URL}/auth/login`,
+        formData,
+        {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
 // GET CATEGORIES
+// PUBLIC
 // ==========================================
 
 export const getCategories = async () => {
+
     const response = await axios.get(
         `${API_URL}/categories/`
     );
@@ -17,10 +59,12 @@ export const getCategories = async () => {
 
 
 // ==========================================
-// GET ALL ARTICLES
+// GET ALL PUBLISHED ARTICLES
+// PUBLIC
 // ==========================================
 
 export const getArticles = async () => {
+
     const response = await axios.get(
         `${API_URL}/articles/`
     );
@@ -31,9 +75,11 @@ export const getArticles = async () => {
 
 // ==========================================
 // GET SINGLE ARTICLE
+// PUBLIC
 // ==========================================
 
 export const getArticle = async (id) => {
+
     const response = await axios.get(
         `${API_URL}/articles/${id}`
     );
@@ -44,9 +90,11 @@ export const getArticle = async (id) => {
 
 // ==========================================
 // GET ARTICLES BY CATEGORY
+// PUBLIC
 // ==========================================
 
 export const getArticlesByCategory = async (categoryId) => {
+
     const response = await axios.get(
         `${API_URL}/articles/category/${categoryId}`
     );
@@ -57,9 +105,13 @@ export const getArticlesByCategory = async (categoryId) => {
 
 // ==========================================
 // GET ARTICLES BY SUBCATEGORY
+// PUBLIC
 // ==========================================
 
-export const getArticlesBySubcategory = async (subcategoryId) => {
+export const getArticlesBySubcategory = async (
+    subcategoryId
+) => {
+
     const response = await axios.get(
         `${API_URL}/articles/subcategory/${subcategoryId}`
     );
@@ -70,6 +122,7 @@ export const getArticlesBySubcategory = async (subcategoryId) => {
 
 // ==========================================
 // CREATE ARTICLE
+// AUTHOR ONLY
 // ==========================================
 
 export const createArticle = async (articleData) => {
@@ -92,26 +145,13 @@ export const createArticle = async (articleData) => {
     );
 
     formData.append(
-        "author",
-        articleData.author
-    );
-
-
-    if (articleData.published_date) {
-        formData.append(
-            "published_date",
-            articleData.published_date
-        );
-    }
-
-
-    formData.append(
         "category_id",
         articleData.category_id
     );
 
 
     if (articleData.subcategory_id) {
+
         formData.append(
             "subcategory_id",
             articleData.subcategory_id
@@ -120,6 +160,7 @@ export const createArticle = async (articleData) => {
 
 
     if (articleData.image) {
+
         formData.append(
             "image",
             articleData.image
@@ -127,9 +168,132 @@ export const createArticle = async (articleData) => {
     }
 
 
+    const token = localStorage.getItem("token");
+
+
     const response = await axios.post(
         `${API_URL}/articles/`,
-        formData
+        formData,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// GET MY ARTICLES
+// AUTHOR ONLY
+// ==========================================
+
+export const getMyArticles = async () => {
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.get(
+        `${API_URL}/articles/my/articles`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// UPDATE ARTICLE
+// AUTHOR ONLY
+// ==========================================
+
+export const updateArticle = async (
+    id,
+    articleData
+) => {
+
+    const formData = new FormData();
+
+    formData.append(
+        "title",
+        articleData.title
+    );
+
+    formData.append(
+        "short_description",
+        articleData.short_description
+    );
+
+    formData.append(
+        "content",
+        articleData.content
+    );
+
+    formData.append(
+        "category_id",
+        articleData.category_id
+    );
+
+
+    if (articleData.subcategory_id) {
+
+        formData.append(
+            "subcategory_id",
+            articleData.subcategory_id
+        );
+    }
+
+
+    if (articleData.image) {
+
+        formData.append(
+            "image",
+            articleData.image
+        );
+    }
+
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.put(
+        `${API_URL}/articles/${id}`,
+        formData,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// SUBMIT ARTICLE FOR REVIEW
+// AUTHOR ONLY
+// ==========================================
+
+export const submitArticle = async (id) => {
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.put(
+        `${API_URL}/articles/${id}/submit`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
     );
 
     return response.data;
@@ -138,12 +302,121 @@ export const createArticle = async (articleData) => {
 
 // ==========================================
 // DELETE ARTICLE
+// AUTHOR ONLY
 // ==========================================
 
 export const deleteArticle = async (id) => {
 
+    const token = localStorage.getItem("token");
+
+
     const response = await axios.delete(
-        `${API_URL}/articles/${id}`
+        `${API_URL}/articles/${id}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// REVIEWER
+// GET ARTICLES
+// ==========================================
+
+export const getReviewArticles = async () => {
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.get(
+        `${API_URL}/reviewer/articles`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// REVIEWER
+// APPROVE ARTICLE
+// ==========================================
+
+export const approveArticle = async (id) => {
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.put(
+        `${API_URL}/reviewer/articles/${id}/approve`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// REVIEWER
+// REJECT ARTICLE
+// ==========================================
+
+export const rejectArticle = async (
+    id,
+    reason
+) => {
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.put(
+        `${API_URL}/reviewer/articles/${id}/reject`,
+        {
+            reason: reason,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// REVIEWER
+// PUBLISH ARTICLE
+// ==========================================
+
+export const publishArticle = async (id) => {
+
+    const token = localStorage.getItem("token");
+
+
+    const response = await axios.put(
+        `${API_URL}/reviewer/articles/${id}/publish`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
     );
 
     return response.data;

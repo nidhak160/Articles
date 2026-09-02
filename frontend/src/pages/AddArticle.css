@@ -1,0 +1,426 @@
+/* ==========================================
+   ADD ARTICLE PAGE
+========================================== */
+
+.add-article-page {
+    min-height: 100vh;
+    background: #f5f7fa;
+    padding: 40px 20px 70px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* ==========================================
+   MAIN CONTAINER
+========================================== */
+
+.add-article-container {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.article-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 28px;
+}
+
+.article-header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #172033;
+    letter-spacing: -0.5px;
+}
+
+.article-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* ==========================================
+   BACK BUTTON
+========================================== */
+
+.back-btn {
+    border: 1px solid #d9dee7;
+    background: #ffffff;
+    color: #344054;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+.back-btn:hover {
+    background: #f0f2f5;
+    border-color: #c5cad3;
+}
+
+
+/* ==========================================
+   SUCCESS MESSAGE
+========================================== */
+
+.success-message {
+    background: #ecfdf3;
+    border: 1px solid #abefc6;
+    color: #067647;
+    padding: 13px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* ==========================================
+   ERROR MESSAGE
+========================================== */
+
+.error-message {
+    background: #fef3f2;
+    border: 1px solid #fecdca;
+    color: #b42318;
+    padding: 13px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* ==========================================
+   FORM CARD
+========================================== */
+
+.article-form {
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    padding: 34px;
+    box-shadow: 0 4px 18px rgba(16, 24, 40, 0.05);
+}
+
+
+/* ==========================================
+   FORM GROUP
+========================================== */
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* ==========================================
+   INPUTS
+========================================== */
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d0d5dd;
+    background: #ffffff;
+    color: #101828;
+    border-radius: 8px;
+    padding: 13px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+
+/* INPUT */
+
+.form-group input {
+    height: 48px;
+}
+
+
+/* TEXTAREA */
+
+.form-group textarea {
+    min-height: 110px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+
+/* CONTENT TEXTAREA */
+
+.form-group textarea[name="content"] {
+    min-height: 300px;
+}
+
+
+/* SELECT */
+
+.form-group select {
+    height: 48px;
+    cursor: pointer;
+}
+
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+
+/* ==========================================
+   PLACEHOLDER
+========================================== */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #98a2b3;
+}
+
+
+/* ==========================================
+   CATEGORY + SUBCATEGORY
+========================================== */
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* ==========================================
+   DISABLED SELECT
+========================================== */
+
+.form-group select:disabled {
+    background: #f2f4f7;
+    color: #98a2b3;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   FILE INPUT
+========================================== */
+
+.form-group input[type="file"] {
+    height: auto;
+    padding: 10px;
+    cursor: pointer;
+    background: #ffffff;
+}
+
+.form-group input[type="file"]::file-selector-button {
+    border: none;
+    background: #eef2ff;
+    color: #344054;
+    padding: 9px 14px;
+    margin-right: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background: #e0e7ff;
+}
+
+
+/* ==========================================
+   SMALL TEXT
+========================================== */
+
+.form-group small {
+    display: block;
+    margin-top: 7px;
+    color: #667085;
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   ACTION BUTTONS
+========================================== */
+
+.article-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #eaecf0;
+    padding-top: 25px;
+    margin-top: 8px;
+}
+
+
+/* ==========================================
+   DRAFT BUTTON
+========================================== */
+
+.draft-btn,
+.submit-btn {
+    min-width: 150px;
+    height: 46px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+
+/* SAVE DRAFT */
+
+.draft-btn {
+    background: #ffffff;
+    border: 1px solid #d0d5dd;
+    color: #344054;
+}
+
+.draft-btn:hover {
+    background: #f9fafb;
+    border-color: #98a2b3;
+}
+
+
+/* ==========================================
+   SUBMIT BUTTON
+========================================== */
+
+.submit-btn {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: #ffffff;
+}
+
+.submit-btn:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+
+/* ==========================================
+   DISABLED BUTTON
+========================================== */
+
+.draft-btn:disabled,
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+
+    .add-article-page {
+        padding: 25px 15px 50px;
+    }
+
+    .article-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .article-header h1 {
+        font-size: 27px;
+    }
+
+    .back-btn {
+        width: 100%;
+    }
+
+    .article-form {
+        padding: 25px 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .article-actions {
+        flex-direction: column;
+    }
+
+    .draft-btn,
+    .submit-btn {
+        width: 100%;
+    }
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+
+    .add-article-page {
+        padding: 20px 10px 40px;
+    }
+
+    .article-header h1 {
+        font-size: 24px;
+    }
+
+    .article-header p {
+        font-size: 14px;
+    }
+
+    .article-form {
+        padding: 20px 15px;
+        border-radius: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 14px;
+    }
+
+    .form-group textarea[name="content"] {
+        min-height: 240px;
+    }
+
+}
