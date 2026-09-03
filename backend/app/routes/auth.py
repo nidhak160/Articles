@@ -370,24 +370,14 @@ def get_current_user(
 # ROLE CHECK
 # ==========================================
 
-def require_role(required_role: str):
-
+def require_role(*roles):
     def role_checker(
-        current_user: User = Depends(
-            get_current_user
-        )
+        current_user: User = Depends(get_current_user)
     ):
-
-        if current_user.role != required_role:
-
+        if current_user.role not in roles:
             raise HTTPException(
-
                 status_code=403,
-
-                detail=(
-                    f"{required_role.capitalize()} "
-                    "permission required"
-                )
+                detail="Not authorized"
             )
 
         return current_user

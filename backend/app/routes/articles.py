@@ -11,10 +11,10 @@ from fastapi import (
 )
 
 from sqlalchemy.orm import Session
-
+from pydantic import BaseModel
 from ..database import get_db
-from ..models import Article, Category, SubCategory, User
-from ..schemas import ArticleResponse
+from ..models import Article, ArticleComment, ArticleLike, ArticleShare, Category, SubCategory, User
+from ..schemas import ArticleResponse, CommentCreate
 from .auth import require_role
 
 
@@ -777,3 +777,551 @@ def delete_article(
     return {
         "message": "Article deleted successfully"
     }
+
+# ==========================================
+# LIKE / UNLIKE ARTICLE
+# LOGIN REQUIRED
+# USER / AUTHOR / REVIEWER
+# ==========================================
+
+@router.post("/{article_id}/like")
+def like_article(
+    article_id: int,
+    current_user: User = Depends(require_role("user", "author", "reviewer")),
+    db: Session = Depends(get_db)
+):
+    # Find article
+    article = (
+        db.query(Article)
+        .filter(
+            Article.id == article_id,
+            Article.status == "published"
+        )
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    # Check existing like
+    existing_like = (
+        db.query(ArticleLike)
+        .filter(
+            ArticleLike.article_id == article_id,
+            ArticleLike.user_id == current_user.id
+        )
+        .first()
+    )
+
+    # If already liked → unlike
+    if existing_like:
+
+        db.delete(existing_like)
+        db.commit()
+
+        liked = False
+
+    # Otherwise → like
+    else:
+
+        new_like = ArticleLike(
+            article_id=article_id,
+            user_id=current_user.id
+        )
+
+        db.add(new_like)
+        db.commit()
+
+        liked = True
+
+    # Get updated count
+    like_count = (
+        db.query(ArticleLike)
+        .filter(
+            ArticleLike.article_id == article_id
+        )
+        .count()
+    )
+
+    return {
+        "liked": liked,
+        "like_count": like_count
+    }    
+
+# ==========================================
+# GET LIKE STATUS
+# LOGIN REQUIRED
+# ==========================================
+
+@router.get("/{article_id}/like")
+def get_like_status(
+    article_id: int,
+    current_user: User = Depends(require_role("user", "author", "reviewer")),
+    db: Session = Depends(get_db)
+):
+
+    article = (
+        db.query(Article)
+        .filter(Article.id == article_id)
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    existing_like = (
+        db.query(ArticleLike)
+        .filter(
+            ArticleLike.article_id == article_id,
+            ArticleLike.user_id == current_user.id
+        )
+        .first()
+    )
+
+    like_count = (
+        db.query(ArticleLike)
+        .filter(
+            ArticleLike.article_id == article_id
+        )
+        .count()
+    )
+
+    return {
+        "liked": existing_like is not None,
+        "like_count": like_count
+    }    
+# ==========================================
+# ADD COMMENT
+# LOGIN REQUIRED
+# USER / AUTHOR / REVIEWER
+# ==========================================
+
+@router.post("/{article_id}/comments")
+def add_comment(
+    article_id: int,
+    data: CommentCreate,
+    current_user: User = Depends(
+        require_role("user", "author", "reviewer")
+    ),
+    db: Session = Depends(get_db)
+):
+
+    # --------------------------------------
+    # CHECK ARTICLE
+    # --------------------------------------
+
+    article = (
+        db.query(Article)
+        .filter(
+            Article.id == article_id,
+            Article.status == "published"
+        )
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    # --------------------------------------
+    # CHECK COMMENT
+    # --------------------------------------
+
+    if not data.comment.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Comment cannot be empty"
+        )
+
+    # --------------------------------------
+    # CREATE COMMENT
+    # --------------------------------------
+
+    new_comment = ArticleComment(
+        article_id=article_id,
+        user_id=current_user.id,
+        comment=data.comment.strip()
+    )
+
+    db.add(new_comment)
+    db.commit()
+    db.refresh(new_comment)
+
+    return {
+        "id": new_comment.id,
+        "article_id": new_comment.article_id,
+        "user_id": new_comment.user_id,
+        "user_name": current_user.name,
+        "comment": new_comment.comment,
+        "created_at": new_comment.created_at
+    }
+
+
+# ==========================================
+# GET ARTICLE COMMENTS
+# PUBLIC
+# NO LOGIN REQUIRED
+# ==========================================
+
+@router.get("/{article_id}/comments")
+def get_article_comments(
+    article_id: int,
+    db: Session = Depends(get_db)
+):
+
+    # --------------------------------------
+    # CHECK ARTICLE
+    # --------------------------------------
+
+    article = (
+        db.query(Article)
+        .filter(
+            Article.id == article_id,
+            Article.status == "published"
+        )
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    # --------------------------------------
+    # GET COMMENTS
+    # --------------------------------------
+
+    comments = (
+        db.query(ArticleComment)
+        .filter(
+            ArticleComment.article_id == article_id
+        )
+        .order_by(
+            ArticleComment.created_at.desc()
+        )
+        .all()
+    )
+
+    # --------------------------------------
+    # RETURN COMMENTS
+    # --------------------------------------
+
+    return [
+        {
+            "id": comment.id,
+            "article_id": comment.article_id,
+            "user_id": comment.user_id,
+            "user_name": (
+                comment.user.name
+                if comment.user
+                else "User"
+            ),
+            "comment": comment.comment,
+            "created_at": comment.created_at
+        }
+        for comment in comments
+    ]
+
+
+# ==========================================
+# AUTHOR / REVIEWER ARTICLE ENGAGEMENT
+# LOGIN REQUIRED
+# AUTHOR / REVIEWER
+# ==========================================
+
+@router.get("/{article_id}/engagement")
+def get_article_engagement(
+    article_id: int,
+
+    current_user: User = Depends(
+        require_role("author", "reviewer")
+    ),
+
+    db: Session = Depends(get_db)
+):
+
+    # --------------------------------------
+    # FIND ARTICLE
+    # --------------------------------------
+
+    article = (
+        db.query(Article)
+        .filter(
+            Article.id == article_id
+        )
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    # --------------------------------------
+    # AUTHOR CAN SEE ONLY OWN ARTICLES
+    # REVIEWER CAN SEE ALL ARTICLES
+    # --------------------------------------
+
+    if (
+        current_user.role == "author"
+        and article.author != current_user.name
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You can only view engagement for your own articles"
+        )
+
+    # --------------------------------------
+    # LIKE COUNT
+    # --------------------------------------
+
+    like_count = (
+        db.query(ArticleLike)
+        .filter(
+            ArticleLike.article_id == article_id
+        )
+        .count()
+    )
+
+    # --------------------------------------
+    # COMMENTS
+    # --------------------------------------
+
+    comments = (
+        db.query(ArticleComment)
+        .filter(
+            ArticleComment.article_id == article_id
+        )
+        .order_by(
+            ArticleComment.created_at.desc()
+        )
+        .all()
+    )
+
+    # --------------------------------------
+    # SHARE COUNT
+    # --------------------------------------
+
+    share_count = (
+        db.query(ArticleShare)
+        .filter(
+            ArticleShare.article_id == article_id
+        )
+        .count()
+    )
+
+    # --------------------------------------
+    # RESPONSE
+    # --------------------------------------
+
+    return {
+        "article_id": article.id,
+
+        "like_count": like_count,
+
+        "comment_count": len(comments),
+
+        "share_count": share_count,
+
+        "comments": [
+            {
+                "id": comment.id,
+
+                "user_id": comment.user_id,
+
+                "user_name": (
+                    comment.user.name
+                    if comment.user
+                    else "User"
+                ),
+
+                "comment": comment.comment,
+
+                "created_at": comment.created_at
+            }
+
+            for comment in comments
+        ]
+    }
+
+
+# ==========================================
+# SHARE ARTICLE
+# LOGIN REQUIRED
+# USER / AUTHOR / REVIEWER
+# ==========================================
+
+@router.post("/{article_id}/share")
+def share_article(
+    article_id: int,
+
+    current_user: User = Depends(
+        require_role("user", "author", "reviewer")
+    ),
+
+    db: Session = Depends(get_db)
+):
+
+    # --------------------------------------
+    # CHECK ARTICLE
+    # --------------------------------------
+
+    article = (
+        db.query(Article)
+        .filter(
+            Article.id == article_id,
+            Article.status == "published"
+        )
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    # --------------------------------------
+    # SAVE SHARE
+    # --------------------------------------
+
+    new_share = ArticleShare(
+        article_id=article_id,
+        user_id=current_user.id
+    )
+
+    db.add(new_share)
+    db.commit()
+    db.refresh(new_share)
+
+    # --------------------------------------
+    # GET UPDATED COUNT
+    # --------------------------------------
+
+    share_count = (
+        db.query(ArticleShare)
+        .filter(
+            ArticleShare.article_id == article_id
+        )
+        .count()
+    )
+
+    return {
+        "shared": True,
+        "share_count": share_count
+    }
+
+
+# ==========================================
+# PUBLIC ARTICLE ENGAGEMENT
+# NO LOGIN REQUIRED
+# ==========================================
+
+@router.get("/{article_id}/engagement/public")
+def get_public_article_engagement(
+    article_id: int,
+    db: Session = Depends(get_db)
+):
+
+    # --------------------------------------
+    # CHECK ARTICLE
+    # --------------------------------------
+
+    article = (
+        db.query(Article)
+        .filter(
+            Article.id == article_id,
+            Article.status == "published"
+        )
+        .first()
+    )
+
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="Article not found"
+        )
+
+    # --------------------------------------
+    # LIKE COUNT
+    # --------------------------------------
+
+    like_count = (
+        db.query(ArticleLike)
+        .filter(
+            ArticleLike.article_id == article_id
+        )
+        .count()
+    )
+
+    # --------------------------------------
+    # COMMENT COUNT
+    # --------------------------------------
+
+    comment_count = (
+        db.query(ArticleComment)
+        .filter(
+            ArticleComment.article_id == article_id
+        )
+        .count()
+    )
+
+    # --------------------------------------
+    # SHARE COUNT
+    # --------------------------------------
+
+    share_count = (
+        db.query(ArticleShare)
+        .filter(
+            ArticleShare.article_id == article_id
+        )
+        .count()
+    )
+
+    return {
+        "article_id": article_id,
+        "like_count": like_count,
+        "comment_count": comment_count,
+        "share_count": share_count
+    }
+
+@router.get("/{article_id}/engagement/public")
+def get_public_engagement(
+    article_id: int,
+    db: Session = Depends(get_db)
+):
+    article = db.query(Article).filter(
+        Article.id == article_id,
+        Article.status == "published"
+    ).first()
+
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    like_count = db.query(ArticleLike).filter(
+        ArticleLike.article_id == article_id
+    ).count()
+
+    comment_count = db.query(ArticleComment).filter(
+        ArticleComment.article_id == article_id
+    ).count()
+
+    share_count = db.query(ArticleShare).filter(
+        ArticleShare.article_id == article_id
+    ).count()
+
+    return {
+        "like_count": like_count,
+        "comment_count": comment_count,
+        "share_count": share_count
+    }        

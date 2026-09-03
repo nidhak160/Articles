@@ -1,5 +1,15 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    DateTime,
+    ForeignKey,
+    UniqueConstraint
+)
+
 from sqlalchemy.orm import relationship
+
 from datetime import datetime
 
 from .database import Base
@@ -46,6 +56,37 @@ class User(Base):
         default=datetime.utcnow
     )
 
+    # --------------------------------------
+    # USER LIKES
+    # --------------------------------------
+
+    likes = relationship(
+        "ArticleLike",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # --------------------------------------
+    # USER COMMENTS
+    # --------------------------------------
+
+    comments = relationship(
+        "ArticleComment",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # --------------------------------------
+    # USER SHARES
+    # --------------------------------------
+
+    shares = relationship(
+        "ArticleShare",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+
 # ==========================================
 # CATEGORY
 # ==========================================
@@ -65,11 +106,19 @@ class Category(Base):
         nullable=False
     )
 
+    # --------------------------------------
+    # SUBCATEGORIES
+    # --------------------------------------
+
     subcategories = relationship(
         "SubCategory",
         back_populates="category",
         cascade="all, delete-orphan"
     )
+
+    # --------------------------------------
+    # ARTICLES
+    # --------------------------------------
 
     articles = relationship(
         "Article",
@@ -101,10 +150,18 @@ class SubCategory(Base):
         nullable=False
     )
 
+    # --------------------------------------
+    # CATEGORY
+    # --------------------------------------
+
     category = relationship(
         "Category",
         back_populates="subcategories"
     )
+
+    # --------------------------------------
+    # ARTICLES
+    # --------------------------------------
 
     articles = relationship(
         "Article",
@@ -184,12 +241,238 @@ class Article(Base):
         onupdate=datetime.utcnow
     )
 
+    # --------------------------------------
+    # CATEGORY
+    # --------------------------------------
+
     category = relationship(
         "Category",
         back_populates="articles"
     )
 
+    # --------------------------------------
+    # SUBCATEGORY
+    # --------------------------------------
+
     subcategory = relationship(
         "SubCategory",
         back_populates="articles"
+    )
+
+    # --------------------------------------
+    # LIKES
+    # --------------------------------------
+
+    likes = relationship(
+        "ArticleLike",
+        back_populates="article",
+        cascade="all, delete-orphan"
+    )
+
+    # --------------------------------------
+    # COMMENTS
+    # --------------------------------------
+
+    comments = relationship(
+        "ArticleComment",
+        back_populates="article",
+        cascade="all, delete-orphan"
+    )
+
+    # --------------------------------------
+    # SHARES
+    # --------------------------------------
+
+    shares = relationship(
+        "ArticleShare",
+        back_populates="article",
+        cascade="all, delete-orphan"
+    )
+
+
+# ==========================================
+# ARTICLE LIKE
+# ==========================================
+
+class ArticleLike(Base):
+    __tablename__ = "article_likes"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    article_id = Column(
+        Integer,
+        ForeignKey(
+            "articles.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    # --------------------------------------
+    # ARTICLE
+    # --------------------------------------
+
+    article = relationship(
+        "Article",
+        back_populates="likes"
+    )
+
+    # --------------------------------------
+    # USER
+    # --------------------------------------
+
+    user = relationship(
+        "User",
+        back_populates="likes"
+    )
+
+    # --------------------------------------
+    # ONE LIKE PER USER PER ARTICLE
+    # --------------------------------------
+
+    __table_args__ = (
+        UniqueConstraint(
+            "article_id",
+            "user_id",
+            name="unique_article_user_like"
+        ),
+    )
+
+
+# ==========================================
+# ARTICLE COMMENT
+# ==========================================
+
+class ArticleComment(Base):
+    __tablename__ = "article_comments"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    article_id = Column(
+        Integer,
+        ForeignKey(
+            "articles.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    comment = Column(
+        Text,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    # --------------------------------------
+    # ARTICLE
+    # --------------------------------------
+
+    article = relationship(
+        "Article",
+        back_populates="comments"
+    )
+
+    # --------------------------------------
+    # USER
+    # --------------------------------------
+
+    user = relationship(
+        "User",
+        back_populates="comments"
+    )
+
+
+# ==========================================
+# ARTICLE SHARE
+# ==========================================
+
+class ArticleShare(Base):
+    __tablename__ = "article_shares"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    article_id = Column(
+        Integer,
+        ForeignKey(
+            "articles.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    # --------------------------------------
+    # ARTICLE
+    # --------------------------------------
+
+    article = relationship(
+        "Article",
+        back_populates="shares"
+    )
+
+    # --------------------------------------
+    # USER
+    # --------------------------------------
+
+    user = relationship(
+        "User",
+        back_populates="shares"
     )

@@ -421,3 +421,139 @@ export const publishArticle = async (id) => {
 
     return response.data;
 };
+
+
+// ==========================================
+// LIKE ARTICLE
+// LOGIN USER ONLY
+// ==========================================
+
+export const likeArticle = async (articleId) => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+        `${API_URL}/articles/${articleId}/like`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// GET ARTICLE LIKE STATUS
+// LOGIN USER ONLY
+// ==========================================
+
+export const getArticleLikeStatus = async (articleId) => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+        `${API_URL}/articles/${articleId}/like`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// ADD COMMENT
+// LOGIN USER ONLY
+// ==========================================
+
+export const addComment = async (articleId, comment) => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+        `${API_URL}/articles/${articleId}/comments`,
+        {
+            comment: comment,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// GET ARTICLE COMMENTS
+// PUBLIC
+// ==========================================
+
+export const getComments = async (articleId) => {
+    const response = await axios.get(
+        `${API_URL}/articles/${articleId}/comments`
+    );
+
+    return response.data;
+};
+
+export const getArticleEngagement = async (articleId) => {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+        `${API_URL}/articles/${articleId}/engagement`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+// ==========================================
+// SHARE ARTICLE
+// LOGIN USER ONLY
+// ==========================================
+
+export const shareArticle = async (articleId) => {
+
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+        `${API_URL}/articles/${articleId}/share`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+
+// ==========================================
+// GET ARTICLE PUBLIC ENGAGEMENT
+// ==========================================
+
+export const getPublicArticleEngagement = async (
+    articleId
+) => {
+
+    const response = await axios.get(
+        `${API_URL}/articles/${articleId}/engagement/public`
+    );
+
+    return response.data;
+};
+

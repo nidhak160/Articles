@@ -1,115 +1,341 @@
+/* =====================================================
+   CATEGORY / SUBCATEGORY PAGE
+===================================================== */
+
 .category-page {
-    margin-top: 70px;
-    max-width: 1200px;
-    
-    padding: 40px 24px;
-       margin-left: 300px;
+    margin-top: 0;
+
+    max-width: none;
+
+    padding: 45px 40px 60px;
+
+    margin-left: 300px;
+
     width: calc(100% - 300px);
+
+    min-height: 100vh;
+
+    box-sizing: border-box;
 }
 
+
+/* =====================================================
+   PAGE TITLE
+===================================================== */
+
 .category-page h1 {
-    font-size: 36px;
+    font-size: 38px;
+
     font-weight: 700;
-    margin-bottom: 30px;
+
+    margin: 0 0 35px;
+
     color: #111827;
 }
+
+
+/* =====================================================
+   ARTICLE GRID
+===================================================== */
 
 .article-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 32px;
 }
+
+
+/* =====================================================
+   ARTICLE CARD
+===================================================== */
 
 .article-card {
     background: #ffffff;
+
     border: 1px solid #e5e7eb;
-    border-radius: 14px;
+
+    border-radius: 16px;
+
     overflow: hidden;
+
+    min-height: 480px;
+
+    display: flex;
+
+    flex-direction: column;
+
     transition: 0.25s ease;
 }
 
+
 .article-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.09);
 }
+
+
+/* =====================================================
+   ARTICLE IMAGE
+===================================================== */
 
 .article-card img {
     width: 100%;
-    height: 210px;
+
+    height: 240px;
+
     object-fit: cover;
+
     display: block;
 }
 
+
+/* =====================================================
+   ARTICLE CONTENT
+===================================================== */
+
 .article-card-content {
-    padding: 20px;
+    padding: 24px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    flex: 1;
 }
 
+
+/* =====================================================
+   ARTICLE TITLE
+===================================================== */
+
 .article-card-content h2 {
-    margin: 0 0 12px;
-    font-size: 21px;
-    line-height: 1.35;
+    margin: 0 0 14px;
+
+    font-size: 23px;
+
+    line-height: 1.4;
+
+    font-weight: 700;
+
     color: #111827;
 }
 
+
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
 .article-card-content p {
-    margin: 0 0 20px;
+    margin: 0 0 25px;
+
     color: #6b7280;
-    font-size: 15px;
-    line-height: 1.6;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+
+    display: -webkit-box;
+
+    -webkit-line-clamp: 4;
+
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
 }
 
+
+/* =====================================================
+   READ MORE BUTTON
+===================================================== */
+
 .article-card-content button {
+    margin-top: auto;
+
+    width: 100%;
+
+    min-height: 48px;
+
     border: none;
+
     background: #111827;
+
     color: #ffffff;
-    padding: 11px 18px;
-    border-radius: 7px;
-    font-size: 14px;
+
+    padding: 13px 20px;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
     font-weight: 600;
+
     cursor: pointer;
+
     transition: 0.2s ease;
 }
 
+
 .article-card-content button:hover {
     background: #374151;
+
+    transform: translateY(-1px);
 }
 
 
-/* ==========================================
+/* =====================================================
    TABLET
-========================================== */
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .category-page {
+        padding: 40px 28px 50px;
+    }
+
+
+    .article-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        gap: 26px;
+    }
+
+
+    .article-card {
+        min-height: 460px;
+    }
+
+
+    .article-card img {
+        height: 230px;
+    }
+
+}
+
+
+/* =====================================================
+   SMALL TABLET
+===================================================== */
 
 @media (max-width: 900px) {
 
+    .category-page {
+        margin-left: 250px;
+
+        width: calc(100% - 250px);
+
+        padding: 35px 25px 45px;
+    }
+
+
     .article-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        gap: 22px;
+    }
+
+
+    .article-card-content {
+        padding: 20px;
+    }
+
+
+    .article-card-content h2 {
+        font-size: 21px;
     }
 
 }
 
 
-/* ==========================================
+/* =====================================================
    MOBILE
-========================================== */
+===================================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
 
     .category-page {
-        padding: 25px 16px;
+        margin-left: 230px;
+
+        width: calc(100% - 230px);
+
+        padding: 30px 20px 40px;
     }
 
+
     .category-page h1 {
-        font-size: 28px;
-        margin-bottom: 22px;
+        font-size: 30px;
+
+        margin-bottom: 25px;
     }
+
 
     .article-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+
+        gap: 25px;
     }
 
+
+    .article-card {
+        min-height: 470px;
+    }
+
+
     .article-card img {
-        height: 200px;
+        height: 240px;
+    }
+
+}
+
+
+/* =====================================================
+   VERY SMALL SCREEN
+===================================================== */
+
+@media (max-width: 550px) {
+
+    .category-page {
+        margin-left: 210px;
+
+        width: calc(100% - 210px);
+
+        padding: 25px 16px 35px;
+    }
+
+
+    .category-page h1 {
+        font-size: 26px;
+    }
+
+
+    .article-card img {
+        height: 220px;
+    }
+
+
+    .article-card-content {
+        padding: 20px;
+    }
+
+
+    .article-card-content h2 {
+        font-size: 20px;
+    }
+
+
+    .article-card-content p {
+        font-size: 15px;
+
+        line-height: 1.6;
+    }
+
+
+    .article-card-content button {
+        min-height: 48px;
+
+        font-size: 14px;
     }
 
 }
